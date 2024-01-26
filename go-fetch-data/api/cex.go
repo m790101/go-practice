@@ -14,7 +14,7 @@ const apiUrl = "https://cex.io/api/ticker/%s/USD"
 func GetRate(currency string) (*dataTypes.Rate, error) {
 	upCurrency := strings.ToUpper(currency)
 	res, err := http.Get(fmt.Sprintf(apiUrl, upCurrency))
-
+	var resCex CexResponse
 	if err != nil {
 		return nil, err
 	}
@@ -24,10 +24,8 @@ func GetRate(currency string) (*dataTypes.Rate, error) {
 		if err != nil {
 			return nil, err
 		}
-		var cryptoRate dataTypes.Rate
-		// json := string(bodyByte)
-		err = json.Unmarshal(bodyByte, &cryptoRate)
-		// json.Marshaler(bodyByte)
+
+		err = json.Unmarshal(bodyByte, &resCex)
 		if err != nil {
 			return nil, err
 		}
@@ -36,7 +34,7 @@ func GetRate(currency string) (*dataTypes.Rate, error) {
 	} else {
 		return nil, fmt.Errorf("Currency %s not found", currency)
 	}
-	rate := dataTypes.Rate{Currency: upCurrency, Price: 20.0}
+	rate := dataTypes.Rate{Currency: upCurrency, Price: resCex.Bid}
 	return &rate, nil
 
 }
